@@ -4,10 +4,8 @@ import asyncio
 import streamlit as st
 from dotenv import load_dotenv
 from pydantic import BaseModel
-from agents import Agent, InputGuardrail, GuardrailFunctionOutput, Runner
+from agents import Agent, InputGuardrail, GuardrailFunctionOutput, Runner, Context
 import nest_asyncio
-# 수정 가능성 있는 위치
-from guardrails.utils.openai_utils import OpenAICall
 nest_asyncio.apply()
 
 # 환경변수 로드
@@ -44,7 +42,6 @@ history_tutor_agent = Agent(
     handoff_description="Specialist agent for historical questions",
     instructions="You provide assistance with historical queries. Explain important events and context clearly.",
     output_type=AnswerOutput,
-    llm_call=OpenAICall(model="gpt-3.5-turbo")  # ✅ 실제 LLM 연결
 )
 
 # Guardrail 함수
@@ -52,7 +49,7 @@ async def homework_guardrail(ctx, agent, input_data):
     result = await Runner.run(guardrail_agent, input_data, context=ctx.context)
     final_output = result.final_output_as(HomeworkOutput)
 
-    st.markdown(f"### 🧠 숙제 판단 결과")
+    st.markdown("### 🧠 숙제 판단 결과")
     st.markdown(f"- **숙제인가요?** → `{final_output.is_homework}`")
     st.markdown(f"- **이유:** {final_output.reasoning}")
 
@@ -61,7 +58,7 @@ async def homework_guardrail(ctx, agent, input_data):
         tripwire_triggered=not final_output.is_homework and not bypass_guardrail,
     )
 
-# Triage Agent 정의 (여기서 문제가 발생했던 부분)
+# Triage Agent 정의
 triage_agent = Agent(
     name="Triage Agent",
     instructions="You determine which agent to use based on the user's homework question.",
@@ -82,7 +79,7 @@ if st.button("질문하기") and user_input.strip():
         async def process():
             try:
                 result = await Runner.run(triage_agent, user_input)
-                return result.final_output or result.response or "❌ AI가 응답하지 않았습니다."
+                return result.final_output or "❌ AI가 응답하지 않았습니다."
             except Exception as e:
                 return f"❌ Guardrail에 의해 차단되었습니다.\n\n**에러:** `{e}`"
 
