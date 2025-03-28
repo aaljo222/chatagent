@@ -23,14 +23,17 @@ class Agent:
     def __str__(self):
         return f"<Agent: {self.name}>"
 
+
 class InputGuardrail:
     def __init__(self, guardrail_function: Callable):
         self.guardrail_function = guardrail_function
+
 
 class GuardrailFunctionOutput:
     def __init__(self, output_info: Any, tripwire_triggered: bool = False):
         self.output_info = output_info
         self.tripwire_triggered = tripwire_triggered
+
 
 class Runner:
     @staticmethod
