@@ -76,11 +76,11 @@ class Context:
 
 async def call_openai(agent: Agent, user_input: str) -> str:
     prompt = f"{agent.instructions.strip()}\n\nUser: {user_input}\nAssistant:"
-    response = openai.ChatCompletion.create(
+    response = openai.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": agent.instructions.strip()},
             {"role": "user", "content": user_input}
-        ],
+        ]
     )
-    return response.choices[0].message["content"]
+    return response.choices[0].message.content
