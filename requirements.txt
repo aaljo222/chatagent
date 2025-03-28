@@ -1,5 +1,6 @@
-streamlit
-openai
-python-dotenv
-pydantic
-nest_asyncio
+streamlit>=1.30.0
+openai>=1.0.0
+python-dotenv>=1.0.0
+pydantic>=1.10.0
+nest_asyncio>=1.5.8
+guardrails-ai>=0.6.4

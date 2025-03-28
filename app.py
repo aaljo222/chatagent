@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel
 from agents import Agent, InputGuardrail, GuardrailFunctionOutput, Runner
 import nest_asyncio
+from guardrails.utils import OpenAICall
 nest_asyncio.apply()
 
 # 환경변수 로드
@@ -42,6 +43,7 @@ history_tutor_agent = Agent(
     handoff_description="Specialist agent for historical questions",
     instructions="You provide assistance with historical queries. Explain important events and context clearly.",
     output_type=AnswerOutput,
+    llm_call=OpenAICall(model="gpt-3.5-turbo")  # ✅ 실제 LLM 연결
 )
 
 # Guardrail 함수
