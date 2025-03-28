@@ -4,6 +4,11 @@ from typing import List, Optional, Callable, Any
 from pydantic import BaseModel
 import openai
 import os
+# agents.py 맨 위쪽에 추가하세요 (BaseModel 임포트 옆에)
+from pydantic import BaseModel
+
+class AnswerOutput(BaseModel):
+    answer: str
 
 class Agent:
     def __init__(
