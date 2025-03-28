@@ -60,13 +60,21 @@ async def homework_guardrail(ctx, agent, input_data):
         output_info=final_output,
         tripwire_triggered=not final_output.is_homework and not bypass_guardrail,
     )
+class AnswerOutput(BaseModel):
+    answer: str
 
-# Triage Agent
-triage_agent = Agent(
-    name="Triage Agent",
-    instructions="You determine which agent to use based on the user's homework question.",
-    handoffs=[history_tutor_agent, math_tutor_agent],
-    input_guardrails=[InputGuardrail(guardrail_function=homework_guardrail)],
+math_tutor_agent = Agent(
+    name="Math Tutor",
+    handoff_description="Specialist agent for math questions",
+    instructions="You provide help with math problems. Explain your reasoning at each step and include examples.",
+    output_type=AnswerOutput,
+)
+
+history_tutor_agent = Agent(
+    name="History Tutor",
+    handoff_description="Specialist agent for historical questions",
+    instructions="You provide assistance with historical queries. Explain important events and context clearly.",
+    output_type=AnswerOutput,
 )
 
 # 질문 처리
@@ -75,12 +83,11 @@ if st.button("질문하기") and user_input.strip():
         async def process():
             try:
                 result = await Runner.run(triage_agent, user_input)
-                return result.final_output or "❌ AI가 응답하지 않았습니다."
+                return result.final_output or result.response or "❌ AI가 응답하지 않았습니다."
             except Exception as e:
                 return f"❌ Guardrail에 의해 차단되었습니다.\n\n**에러:** `{e}`"
 
-        # Streamlit에서 async 지원 시 await 사용
-        answer = asyncio.run(process())  # <-- 이 줄을 다음으로 바꿔보세요
-        # answer = await process()      # (Streamlit 내부에서 async 가능 시)
+        # Streamlit 배포 환경에서는 run_until_complete 방식 추천
+        answer = asyncio.get_event_loop().run_until_complete(process())
         st.markdown("### 📘 AI Tutor의 답변")
-        st.write(str(answer))
+        st.write(answer.answer if isinstance(answer, AnswerOutput) else str(answer))
