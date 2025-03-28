@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 from pydantic import BaseModel
 from agents import Agent, InputGuardrail, GuardrailFunctionOutput, Runner
 import nest_asyncio
-from guardrails.utils import OpenAICall
+# 수정 가능성 있는 위치
+from guardrails.utils.openai_utils import OpenAICall
 nest_asyncio.apply()
 
 # 환경변수 로드
